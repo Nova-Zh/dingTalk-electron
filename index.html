@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>皮皮虾</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+<!--头部拖拽区-->
+<div class="drag index-drag">
+    <div class="logo">
+        <img src="./img/logo.png">
+    </div>
+    <!--搜索框-->
+    <div class="search">
+        <input id="search" type="text" placeholder="联系人、群组、聊天记录">
+        <div class="search-img magnifier"><img src="./img/magnifier.png"></div>
+        <div class="search-img close"><img class="close-img" src="./img/close.png"></div>
+    </div>
+    <div class="upload">
+        <img src="./img/upload.png">
+        <div class="icon-hover down-up">上传/下载</div>
+    </div>
+    <!--关闭最大最小化-->
+    <div class="three-btn btn1">×</div>
+    <div class="three-btn btn2">□</div>
+    <div class="three-btn btn3">－</div>
+</div>
+<!--搜索弹出层-->
+<div class="layout"></div>
+<!--左侧菜单栏-->
+<div class="main-menu">
+    <div class="user">
+        <img src="img/user.jpg">
+    </div>
+    <ul class="menu-middle">
+        <li class="user-news">
+            <img src="img/news.png">
+            <div class="icon-hover news">消息</div>
+        </li>
+        <li class="user-ding">
+            <img src="img/ding.png">
+            <div class="icon-hover ding">DING</div>
+        </li>
+        <li class="user-call">
+            <img src="img/call.png">
+            <div class="icon-hover call">电话</div>
+        </li>
+        <li class="user-contact">
+            <img src="img/contact.png">
+            <div class="icon-hover contact">联系人</div>
+        </li>
+        <li class="user-work">
+            <img src="img/work.png">
+            <div class="icon-hover work">工作</div>
+        </li>
+        <li class="user-pan">
+            <img src="img/pan.png">
+            <div class="icon-hover pan">钉盘</div>
+        </li>
+    </ul>
+    <ul class="menu-foot">
+        <li class="foot-email">
+            <img src="img/email.png">
+            <div class="icon-hover email">钉邮</div>
+        </li>
+        <li class="foot-plus">
+            <img src="img/plus.png">
+            <div class="icon-hover plus">创建</div>
+        </li>
+        <li class="foot-more">
+            <img src="img/more.png">
+            <div class="icon-hover more">更多</div>
+        </li>
+    </ul>
+</div>
+<!--列表区-->
+<div class="main-list">
+    <ul style="margin-top: 60px;">
+        <li>
+            <div class="talk-list">
+                <div class="talk-close">×</div>
+                <div class="talk-img">
+                    <img src="img/file.png">
+                </div>
+                <div class="talk-title">
+                    <div class="title-data"><p>文件小助手</p><i class="talk-data">08-08</i></div>
+                    <p>无需数据线，电脑和手机111111</p>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="talk-list">
+                <div class="talk-close">×</div>
+                <div class="talk-img">
+                    <img src="img/file.png">
+                </div>
+                <div class="talk-title">
+                    <div class="title-data"><p>文件小助手</p><i class="talk-data">08-08</i></div>
+                    <p>无需数据线，电脑和手机111111</p>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<!--内容区（聊天）-->
+<div class="main-chat">
+    <div class="main-chat-content">
+        <div class="chat-top">
+            <div class="chat-user">
+                <img src="img/file.png">
+                <p style="float: right;">文件小助手</p>
+            </div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="chat-dialogue"></div>
+        <div class="chat-write">
+            <!--<div class="chat-left">-->
+            <ul class="chat-toolbar">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+            <textarea class="chat-text"></textarea>
+            <!--</div>-->
+            <div class="send-btn">发送</div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    const ipc = require('electron').ipcRenderer;
+    var huanyuan = true;
+
+    $(function () {
+        $(".upload img").mouseover(function () {
+            $(".down-up").show();
+        }).mouseout(function () {
+            $(".down-up").hide();
+        });
+
+        $(".user-news img").mouseover(function () {
+            $(".news").show();
+        }).mouseout(function () {
+            $(".news").hide();
+        });
+
+        $(".user-ding img").mouseover(function () {
+            $(".ding").show();
+        }).mouseout(function () {
+            $(".ding").hide();
+        });
+
+        $(".user-call img").mouseover(function () {
+            $(".call").show();
+        }).mouseout(function () {
+            $(".call").hide();
+        });
+
+        $(".user-contact img").mouseover(function () {
+            $(".contact").show();
+        }).mouseout(function () {
+            $(".contact").hide();
+        });
+
+        $(".user-work img").mouseover(function () {
+            $(".work").show();
+        }).mouseout(function () {
+            $(".work").hide();
+        });
+
+        $(".user-pan img").mouseover(function () {
+            $(".pan").show();
+        }).mouseout(function () {
+            $(".pan").hide();
+        });
+
+        $(".foot-email img").mouseover(function () {
+            $(".email").show();
+        }).mouseout(function () {
+            $(".email").hide();
+        });
+
+        $(".foot-plus img").mouseover(function () {
+            $(".plus").show();
+        }).mouseout(function () {
+            $(".plus").hide();
+        });
+
+        $(".foot-more img").mouseover(function () {
+            $(".more").show();
+        }).mouseout(function () {
+            $(".more").hide();
+        });
+
+        $(".btn1").click(function () {
+            ipc.send('window-all-closed');
+        });
+
+        $(".btn2").click(function () {
+            if (huanyuan) {
+                ipc.send('show-window1');
+            } else {
+                ipc.send('orignal-window1');
+            }
+            huanyuan = !huanyuan;
+        });
+
+        $(".btn3").click(function () {
+            ipc.send('hide-window1');
+        });
+
+        $(".talk-list").mouseover(function () {
+            $(this).find(".talk-close").addClass('add-show');
+            //$(".talk-close").addClass('add-show');
+        }).mouseout(function () {
+            $(".talk-close").removeClass('add-show');
+        }).click(function () {
+            $(".main-chat").css("background-image", "none");
+            $('.main-chat-content').show();
+            $(".chat-text").focus();
+        });
+
+        $(".talk-close").click(function () {
+            $(this).parent().parent().hide();
+        });
+        $(".close-img").click(function () {
+            var val = $("#search").val().length;
+            if (val > 0) {
+                $("#search").val("").focus();
+            }
+        });
+
+        $("#search").focus(function () {
+            $(this).attr("placeholder", "搜索...");
+            $("#search, .search").css("background", "#fff");
+            $("#search").css("color", "#000");
+            $(".search").animate({width: '280px'}, "fast");
+            $(".magnifier").show();
+            $(".magnifier img").css("visibility", "inherit");
+            $(".layout").show();
+            onFocus();
+            $(this).keyup(function () {
+                onFocus();
+            });
+        });
+
+        $(".main-menu, .main-list, .main-chat").click(function () {
+            $("#search").attr("placeholder", "联系人、群组、聊天记录");
+            $("#search, .search").css("background", "#0280D8");
+            $("#search").css("color", "#fff");
+            $(".search-img").hide();
+            $(".search").animate({width: '200px'}, "fast");
+            $(".layout").hide();
+            onBlur();
+        });
+
+        $('.chat-text').bind('textarea porpertychange', function () {
+            var val = $('.chat-text').val().length;
+            if (val > 0) {
+                $('.send-btn').addClass('sendBtn');
+            } else {
+                $('.send-btn').removeClass('sendBtn');
+            }
+        });
+
+        function onFocus() {
+            var val = ($("#search").val()).length;
+            if (val > 0) {
+                $(".close").show();
+                $(".close img").css("visibility", "inherit");
+            } else {
+                $(".close img").css("visibility", "hidden");
+            }
+        }
+
+        function onBlur() {
+            var val = ($("#search").val());
+            if (val != "") {
+                $(".close img").css("visibility", "hidden");
+            }
+        }
+
+    });
+
+    $(window).resize(function () {
+        var width = $(this).width();
+        var height = $(this).height();
+        if (width > 960) {
+            var w = width - 312;
+            var chatWidth = width - 405;
+            $(".main-chat").css("width", w);
+            $(".chat-text").css("width", chatWidth);
+        } else {
+            $(".main-chat").css("width", "648");
+            $(".chat-text").css("width", '550');
+        }
+        if (height > 600) {
+            var h = height - 217;
+            $(".chat-dialogue").css("height", h);
+        } else {
+            $(".chat-dialogue").css("height", 383);
+        }
+    })
+</script>
+</html>

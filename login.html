@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>皮皮虾</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/common.css">
+</head>
+
+<body>
+<div class="drag">
+    <div class="three-btn btn1">×</div>
+    <div class="three-btn btn2">□</div>
+    <div class="three-btn btn3">－</div>
+</div>
+<!--<div class="content">-->
+
+<div class="login-main">
+    <div class="login-type type1 blue1">扫码登录</div>
+    <div class="login-type type2 blue">密码登录</div>
+    <div class="login-code">
+        <img src="img/code.png" alt="">
+        <div>请使用皮皮虾扫描二维码登录</div>
+        <div class="reg">
+            <a class="reg-new">新用户注册</a>
+        </div>
+    </div>
+    <div class="login-pwd">
+        <img src="img/user.jpg" alt="">
+        <input id="phone" class="phone" type="text" maxlength="11" placeholder="请输入手机号码">
+        <input id="pwd" class="pwd" type="password" placeholder="请输入密码">
+        <button id="login" class="login" onclick="loginClick">登录</button>
+        <div class="reg" style="padding-top: 23px;">
+            <a class="reg-new">新用户注册 </a>
+            <span>|</span>
+            <a class="reg-pwd"> 忘记密码</a>
+            <div class="auto-login">
+                <input type="checkbox">
+                &nbsp;自动登录
+            </div>
+        </div>
+    </div>
+    <div class="err">
+        <div class="close-err">×</div>
+        <p></p>
+    </div>
+</div>
+<div class="layout-reg login-main">
+    <div class="layout-title">
+        注册
+        <div class="register-close">×</div>
+    </div>
+    <div class="reg-main login-pwd">
+        <img src="img/user.jpg">
+        <div style="line-height: 55px">
+            <input id="reg-phone" class="phone" type="text" maxlength="11" placeholder="请输入手机号码">
+            <button class="check-code">发送验证码</button>
+        </div>
+        <input id="reg-code" class="pwd" type="text" maxlength="6" placeholder="请输入验证码">
+        <button id="reg" class="login">注册</button>
+    </div>
+</div>
+<div class="layout-pwd login-main">
+    <div class="layout-title">
+        忘记密码
+        <div class="register-close">×</div>
+    </div>
+    <div class="reg-main login-pwd">
+        <img src="img/user.jpg" alt="">
+        <input class="phone" type="text" maxlength="11" placeholder="请输入手机号码">
+        <button class="check-code">发送验证码</button>
+        <input class="pwd" type="password" placeholder="请输入密码">
+        <button class="reg-btn login">登录</button>
+    </div>
+</div>
+<div class="reg-setting">
+    <div class="setting-title">新用户设置</div>
+    <div class="setting-name">
+        昵称：<input class="setting-input" type="text" placeholder="20个字以内">
+    </div>
+    <div class="setting-other">
+        <p>设置密码：<input id="regPwd" class="setting-input" type="password" placeholder="请输入6~20位密码"></p>
+        <p>再次确认密码：<input id="confirmPwd" class="setting-input" type="password" placeholder="再次输入密码"></p>
+    </div>
+    <button class="setting-btn">确定</button>
+</div>
+<!--</div>-->
+</body>
+<script>
+    const ipc = require('electron').ipcRenderer;
+    var verifyCodeBtnDom = $('.check-code');
+    var code = $('.reg-code');
+    var countdown;
+    var flag = 1;
+    var regBtn = 0;
+    $(function () {
+        var huanyuan = true;
+        $(".btn1").click(function () {
+            ipc.send('window-all-closed');
+        });
+
+        $(".btn2").click(function () {
+            if (huanyuan) {
+                ipc.send('show-window');
+            } else {
+                ipc.send('orignal-window');
+            }
+            huanyuan = !huanyuan;
+        });
+
+        $(".btn3").click(function () {
+            ipc.send('hide-window');
+        });
+
+        $(".type1").click(function () {
+            AddClass('.type1', '.type2');
+            Show('.login-pwd', '.login-code');
+        });
+
+        $(".type2").click(function () {
+            AddClass('.type2', '.type1');
+            Show('.login-code', '.login-pwd');
+        });
+
+
+        $('.reg-new').click(function () {
+            $('.layout-reg,.reg-main').show();
+        });
+
+        $('.reg .reg-pwd').click(function () {
+            $('.layout-pwd').show();
+        });
+
+        $('.register-close').click(function () {
+            $(".layout-pwd, .layout-reg").hide();
+        });
+
+        $(".close-err").click(function () {
+            $(".err").css("visibility", "hidden");
+            $(".login").focus();
+        });
+
+        $('#reg-phone, #reg-code').bind('input porpertychange', function () {
+            let code = $.trim($("#reg-code").val());
+            let phone = $.trim($("#reg-phone").val());
+
+            if (phone.length == 11 && code.length == 6) {
+                $("#reg").addClass("highlight", "highlight:hover");
+                regBtn = 1;
+            } else {
+                $("#reg").removeClass("highlight", "highlight:hover");
+                regBtn = 0;
+            }
+        });
+
+        $("#pwd, #phone").bind('input porpertychange', function () {
+            let pwd = $("#pwd").val();
+            let phone = $("#phone").val();
+            if (pwd.length >= 4 && phone.length == 11) {
+                $("#login").removeAttr("disabled").addClass("highlight", "highlight:hover");
+                flag = 1;
+            } else {
+                $("#login").attr("disabled", true).removeClass("highlight", "highlight:hover");
+                flag = 0;
+            }
+        });
+
+        $("#regPwd, #confirmPwd").bind('input porpertychange', function () {
+            let regPwd = $("#regPwd").replace(/\D/g, '').val();
+            let confirmPwd = $("#confirmPwd").replace(/\D/g, '').val();
+        });
+
+        verifyCodeBtnDom.click(function() {
+            var phone = $('#reg-phone').val();
+            if (flag) {
+                if (isPhoneNo(phone)) {
+                    getVerifyCode();
+                } else {
+                    alert('请输入正确的手机号码')
+                }
+            }
+        });
+
+        $('#reg').click(function() {
+            if (regBtn) {
+                $('.reg-setting').show();
+            }
+        });
+
+        $("#login").click(function () {
+            formValidate();
+            ipc.send('zqz-show');
+//                let pwd = $.trim($(".pwd").val());
+//                let phoneNo = $.trim($(".phone").val());
+//                if(formValidate()) {
+//                    $.post("http://10.0.5.131:9999/login",{
+//                        userName:"张三",
+//                        pwd:pwd,
+//                        phoneNo:phoneNo
+//                    }, function(data,status){
+//                        alert("Data: " + data + "\nStatus: " + status);
+//                        if(data.success = status){
+//                            ipc.send('zqz-show');
+//                        } else {
+//                            alert("请输入6位正确的密码");
+//                        }
+//                    })
+//                } else {
+//                    formValidate();
+//                }
+
+        });
+
+//        function regClick() {
+//            alert('--=-=================');
+//            if (flag && (code.val().length == 6)) {
+//                $('.reg-setting').show();
+//            }
+//        }
+
+    });
+
+
+//    $('#reg').click(function() {
+//        alert('--=-=================');
+//        if (flag && (code.val().length == 6)) {
+//            $('.reg-setting').show();
+//        }
+//    });
+
+    function loginClick() {
+        formValidate();
+        ipc.send('zqz-show');
+//        let pwd = $.trim($(".pwd").val());
+//        let phoneNo = $.trim($(".phone").val());
+//        if (formValidate()) {
+//            $.post("http://10.0.5.131:9999/login", {
+//                userName: "张三",
+//                pwd: pwd,
+//                phoneNo: phoneNo
+//            }, function (data, status) {
+//                alert("Data: " + data + "\nStatus: " + status);
+//                if (data.success = status) {
+//                    ipc.send('zqz-show');
+//                } else {
+//                    alert("请输入6位正确的密码");
+//                }
+//            })
+//        } else {
+//            formValidate();
+//        }
+    }
+
+    function confirmClick() {
+
+    }
+
+    verifyCodeBtnDom.addClass("highlight", ".highlight:hover");
+
+    function getVerifyCode() {
+        var count = 60;
+        verifyCodeBtnDom.removeClass("highlight", "highlight:hover").html(count + 'S');
+        flag = 0;
+        countdown = setInterval(function () {
+            if (count == 0) {
+                resetGetSmsBtn();
+            } else {
+                count--;
+                verifyCodeBtnDom.html(count + 'S');
+            }
+        }, 1000)
+    }
+
+    function resetGetSmsBtn() {
+        verifyCodeBtnDom.addClass("highlight", ".highlight:hover").html('发送验证码');
+        clearInterval(countdown);
+        flag = 1;
+    }
+
+    function AddClass(c1, c2) {
+        $(c1).addClass("blue").removeClass("blue1");
+        $(c2).addClass("blue1");
+    }
+
+    function Show(a, b) {
+        $(a).hide();
+        $(b).show();
+    }
+    //         验证手机号
+    function isPhoneNo(phone) {
+        var pattern = /^1[34578]\d{9}$/;
+        return pattern.test(phone);
+    }
+    //密码校验
+    function checkPwd() {
+        var regPwd = $('#regPwd').val();
+        var confirmPwd = $('#confirmPwd').val();
+        if (($.trim(regPwd)) == ($.trim(confirmPwd))) {
+            return true;
+        } else {
+            alert('两次密码不一致')
+        }
+    }
+    //         验证函数
+    function formValidate() {
+        var str = '';
+        var val = $('#phone').val();
+        // 判断手机号码
+        if ($.trim(val).length == 0) {
+            $(".login").attr("disable", true);
+            $('.phone').focus();
+        } else if (isPhoneNo($.trim(val)) == false) {
+            str += "手机号码不正确";
+            $('.phone').focus();
+        }
+
+        if (str != '') {
+            $("p").replaceWith(function () {
+                var text = $("<p></p>").text(str);
+                return text;
+            });
+            $(".err").css("visibility", "inherit");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+</script>
+</html>
